@@ -1,24 +1,3 @@
-import numpy as np
-from dokusan import generators
-
-# Generate Board
-# board = [
-#         [7, 8, 0, 4, 0, 0, 1, 2, 0],
-#         [6, 0, 0, 0, 7, 5, 0, 0, 9],
-#         [0, 0, 0, 6, 0, 1, 0, 7, 8],
-#         [0, 0, 7, 0, 4, 0, 2, 6, 0],
-#         [0, 0, 1, 0, 5, 0, 9, 3, 0],
-#         [9, 0, 4, 0, 6, 0, 0, 0, 5],
-#         [0, 7, 0, 3, 0, 0, 0, 1, 2],
-#         [1, 2, 0, 0, 0, 7, 4, 0, 0],
-#         [0, 4, 9, 2, 0, 6, 0, 0, 7]
-#     ]
-board = np.array(list(str(generators.random_sudoku(avg_rank=150))))
-board = board.astype(int)
-board = board.reshape((9, 9))
-board = board.tolist()
-
-
 def find_empty(bo):
     for row in range(len(bo)):
         for column in range(len(bo[0])):
@@ -78,9 +57,3 @@ def solve(bo):
             bo[row][col] = 0
     return False
 
-
-print('Unsolved Board\n')
-print_board(board)
-print('\nSolved Board\n')
-solve(board)
-print_board(board)
