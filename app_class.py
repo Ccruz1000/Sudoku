@@ -6,12 +6,16 @@ import numpy as np
 from dokusan import generators
 from solver import *
 
+# Init Board
+board = [[0 for x in range(9)] for x in range(9)]
+
+
 class App:
     def __init__(self):
         pygame.init()
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         self.running = True
-        self.grid = []
+        self.grid = board
         self.selected = None
         self.mousepos = None
         self.state = "playing"
@@ -249,4 +253,3 @@ class App:
             return True
         except:
             return False
-
