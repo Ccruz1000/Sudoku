@@ -99,6 +99,7 @@ class App:
         self.check_cols()
         self.check_small_grid()
 
+
     def check_rows(self):
         for yidx, row in enumerate(self.grid):
             possibles = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -160,6 +161,7 @@ class App:
             board = board.tolist()
         self.grid = board
         self.load()
+
     def solve_puzzle(self, board):
         solve(board)
 
@@ -204,16 +206,16 @@ class App:
                                            color=(117, 172, 112), text='Submit', params=1))
         self.playing_buttons.append(Button(WIDTH // 2 - (WIDTH//7) // 2, 50, WIDTH // 7, 40,
                                            function=self.get_puzzle,
-                                           color=(204, 197, 110), text='Easy', params=75))
+                                           color=(255, 255, 0), text='Easy', params=75))
         self.playing_buttons.append(Button(380, 50, WIDTH // 7, 40,
                                            function=self.get_puzzle,
-                                           color=(199, 129, 48), text='Medium', params=150))
+                                           color=(255, 128, 0), text='Medium', params=150))
         self.playing_buttons.append(Button(500, 50, WIDTH // 7, 40,
                                            function=self.get_puzzle,
-                                           color=(207, 68, 68), text='Hard', params=225))
-        self.playing_buttons.append(Button(WIDTH // 2 - (WIDTH // 7) // 2, 0, WIDTH // 7, 40,
+                                           color=(255, 0, 0), text='Hard', params=225))
+        self.playing_buttons.append(Button(140, 0, WIDTH // 7, 40,
                                            function=self.load,
-                                           color=(255, 247, 0), text='Load'))
+                                           color=(153, 153, 255), text='Load'))
         self.playing_buttons.append(Button(500, 0, WIDTH // 7, 40, function = self.solve_puzzle,
                                            color=(6, 255, 22), text = 'Solve', params=self.grid))
 
