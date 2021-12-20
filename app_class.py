@@ -91,6 +91,7 @@ class App:
         self.cell_changed = False
 
 # Board Checking Functions
+
     def all_cells_done(self):
         for row in self.grid:
             for num in row:
@@ -102,7 +103,6 @@ class App:
         self.check_rows()
         self.check_cols()
         self.check_small_grid()
-
 
     def check_rows(self):
         for yidx, row in enumerate(self.grid):
@@ -154,6 +154,7 @@ class App:
                                             self.incorrect_cells.append([xidx2, yidx2])
 
 # Helper Functions
+
     def get_puzzle(self, difficulty):
         if difficulty == 1:
             board = [[0 for x in range(9)] for x in range(9)]
@@ -165,10 +166,8 @@ class App:
         self.grid = board
         self.load()
 
-
     def solve_puzzle(self, bo):
         solve(bo)
-
 
     def hint(self):
         placeholder = copy.deepcopy(self.grid)
@@ -181,9 +180,6 @@ class App:
                 self.grid[yidx][xidx] = solved_board[yidx][xidx]
                 cntr += 1
         self.load()
-
-
-
 
     def draw_numbers(self, window):
         for yidx, row in enumerate(self.grid):
@@ -259,7 +255,6 @@ class App:
         if len(self.incorrect_cells) == 0 and self.finished is True:
             self.playing_buttons.append(Button(200, 275, 200, 100, color=(3, 11, 252), highlightcolor=(3, 11, 252),
                                                text='Congratulations'))
-
 
     def text_to_screen(self, window, text, pos):
         font = self.font.render(text, False, BLACK)
