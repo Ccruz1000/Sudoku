@@ -1,6 +1,7 @@
 import pygame
 import sys
 from settings import *
+from button_class import *
 
 
 class App:
@@ -12,6 +13,10 @@ class App:
         self.selected = None
         self.mousepos = None
         self.state = "playing"
+        self.menu_buttons = []
+        self.playing_buttons = []
+        self.end_buttons = []
+        self.load_buttons()
 
     def run(self):
         while self.running:
@@ -21,6 +26,8 @@ class App:
                 self.playing_draw()
         pygame.quit()
         sys.exit()
+
+# Playing State Function
 
     def playing_events(self):
         for event in pygame.event.get():
@@ -35,13 +42,19 @@ class App:
 
     def playing_update(self):
         self.mousepos = pygame.mouse.get_pos()
+        for button in self.playing_buttons:
+            button.update(self.mousepos)
 
     def playing_draw(self):
         self.window.fill(WHITE)
+        for button in self.playing_buttons:
+            button.draw(self.window)
         if self.selected:
             self.draw_selection(self.window, self.selected)
         self.drawgrid(self.window)
         pygame.display.update()
+
+# Helper Functions
 
     def draw_selection(self, window, pos):
         pygame.draw.rect(window, LIGHTBLUE, ((pos[0]*cell_size)+grid_pos[0], (pos[1]*cell_size)+grid_pos[1],
@@ -67,3 +80,6 @@ class App:
         if self.mousepos[0] > grid_pos[0] + grid_size or self.mousepos[1] > grid_pos[1] + grid_size:
             return False
         return (self.mousepos[0] - grid_pos[0])//cell_size, (self.mousepos[1] - grid_pos[1])//cell_size
+
+    def load_buttons(self):
+        self.playing_buttons.append(Button(20, 40, 100, 40))
