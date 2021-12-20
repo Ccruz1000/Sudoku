@@ -174,12 +174,9 @@ class App:
         placeholder = copy.deepcopy(self.grid)
         solved_board = solve(placeholder)
         cntr = 0
-        print(cntr)
         while cntr < 3:
-            print(cntr)
             xidx = random.randint(0, 8)
             yidx = random.randint(0, 8)
-            print([xidx, yidx])
             if [xidx, yidx] not in self.locked_cells and [xidx, yidx] not in self.incorrect_cells:
                 self.grid[yidx][xidx] = solved_board[yidx][xidx]
                 cntr += 1
@@ -232,7 +229,7 @@ class App:
         # Beginner
         self.playing_buttons.append(Button(20, 0, WIDTH // 7, 40,
                                            function=self.get_puzzle,
-                                           color=(15, 255, 51), text='Beginner', params=75))
+                                           color=(15, 255, 51), text='Beginner', params=50))
         # Easy
         self.playing_buttons.append(Button(20, 50, WIDTH // 7, 40,
                                            function=self.get_puzzle,
