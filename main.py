@@ -1,1 +1,5 @@
-print('Natasha is really really really really really really pretty')
+from app_class import *
+
+if __name__ == "__main__":
+    app = App()
+    app.run()

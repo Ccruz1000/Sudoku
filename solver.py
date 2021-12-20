@@ -1,0 +1,86 @@
+import numpy as np
+from dokusan import generators
+
+# Generate Board
+# board = [
+#         [7, 8, 0, 4, 0, 0, 1, 2, 0],
+#         [6, 0, 0, 0, 7, 5, 0, 0, 9],
+#         [0, 0, 0, 6, 0, 1, 0, 7, 8],
+#         [0, 0, 7, 0, 4, 0, 2, 6, 0],
+#         [0, 0, 1, 0, 5, 0, 9, 3, 0],
+#         [9, 0, 4, 0, 6, 0, 0, 0, 5],
+#         [0, 7, 0, 3, 0, 0, 0, 1, 2],
+#         [1, 2, 0, 0, 0, 7, 4, 0, 0],
+#         [0, 4, 9, 2, 0, 6, 0, 0, 7]
+#     ]
+board = np.array(list(str(generators.random_sudoku(avg_rank=150))))
+board = board.astype(int)
+board = board.reshape((9, 9))
+board = board.tolist()
+
+
+def find_empty(bo):
+    for row in range(len(bo)):
+        for column in range(len(bo[0])):
+            if bo[row][column] == 0:
+                return row, column
+    return None
+
+
+def print_board(bo):
+    # Separate Rows into squares
+    for row in range(len(bo)):
+        if row % 3 == 0 and row != 0:
+            print("- - - - - - - - - - - - - ")
+    # Separate Columns into squares
+        for column in range(len(bo[0])):
+            if column % 3 == 0 and column != 0:
+                print(' | ', end='')
+
+            if column == 8:
+                print(bo[row][column])
+            else:
+                print(str(bo[row][column]) + ' ', end='')
+
+
+def valid(bo, num, pos):
+    # Check rows
+    for i in range(len(bo[0])):
+        if bo[pos[0]][i] == num and pos[1] != i:
+            return False
+    # Check columns
+    for i in range(len(bo)):
+        if bo[i][pos[1]] == num and pos[0] != i:
+            return False
+    # Check squares
+    box_x = pos[1] // 3
+    box_y = pos[0] // 3
+    for i in range(box_y*3, box_y*3 + 3):
+        for j in range(box_x*3, box_x*3 + 3):
+            if bo[i][j] == num and (i, j) != pos:
+                return False
+    return True
+
+
+def solve(bo):
+    # Check if solution is finished
+    find = find_empty(bo)
+    if not find:
+        return True
+    else:
+        row, col = find
+    # Run back-tracking algorithm
+    for i in range(1, 10):
+        if valid(bo, i, (row, col)):
+            bo[row][col] = i
+            if solve(bo):
+                return True
+            bo[row][col] = 0
+    return False
+
+
+print('Unsolved Board\n')
+print_board(board)
+print('\nSolved Board\n')
+solve(board)
+print_board(board)
