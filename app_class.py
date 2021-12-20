@@ -71,18 +71,20 @@ class App:
                 self.check_all_cells()
                 if len(self.incorrect_cells) == 0:
                     self.finished = True
-
+                    button.draw(self.window)
+                    self.playing_draw()
+                    self.load()
 
     def playing_draw(self):
         self.window.fill(WHITE)
-        for button in self.playing_buttons:
-            button.draw(self.window)
         if self.selected:
             self.draw_selection(self.window, self.selected)
         self.shade_locked_cells(self.window, self.locked_cells)
         self.shade_incorrect_cells(self.window, self.incorrect_cells)
         self.draw_numbers(self.window)
         self.drawgrid(self.window)
+        for button in self.playing_buttons:
+            button.draw(self.window)
         pygame.display.update()
         self.cell_changed = False
 
@@ -141,7 +143,6 @@ class App:
                         else:
                             if [xidx, yidx] not in self.locked_cells and [xidx, yidx] not in self.incorrect_cells:
                                 self.incorrect_cells.append([xidx, yidx])
-                                print("error found")
                             if [xidx, yidx] in self.locked_cells:
                                 for k in range(3):
                                     for l in range(3):
@@ -216,8 +217,12 @@ class App:
         self.playing_buttons.append(Button(140, 0, WIDTH // 7, 40,
                                            function=self.load,
                                            color=(153, 153, 255), text='Load'))
-        self.playing_buttons.append(Button(500, 0, WIDTH // 7, 40, function = self.solve_puzzle,
-                                           color=(6, 255, 22), text = 'Solve', params=self.grid))
+        self.playing_buttons.append(Button(500, 0, WIDTH // 7, 40, function=self.solve_puzzle,
+                                           color=(6, 255, 22), text='Solve', params=self.grid))
+        if len(self.incorrect_cells) == 0 and self.finished is True:
+            self.playing_buttons.append(Button(200, 275, 200, 100, color=(3, 11, 252), highlightcolor=(3, 11, 252),
+                                               text='Congratulations'))
+
 
     def text_to_screen(self, window, text, pos):
         font = self.font.render(text, False, BLACK)
@@ -255,3 +260,9 @@ class App:
             return True
         except:
             return False
+
+
+# TODO Add option to pencil in possible values
+# TODO Add hint button
+# TODO Add more difficulty levels
+
