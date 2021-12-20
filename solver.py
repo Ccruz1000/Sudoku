@@ -53,7 +53,7 @@ def solve(bo):
         if valid(bo, i, (row, col)):
             bo[row][col] = i
             if solve(bo):
-                return True
+                return bo
             bo[row][col] = 0
     return False
 

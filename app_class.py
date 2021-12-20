@@ -5,6 +5,8 @@ from button_class import *
 import numpy as np
 from dokusan import generators
 from solver import *
+import random
+import copy
 
 # Init Board
 board = [[0 for x in range(9)] for x in range(9)]
@@ -163,8 +165,28 @@ class App:
         self.grid = board
         self.load()
 
-    def solve_puzzle(self, board):
-        solve(board)
+
+    def solve_puzzle(self, bo):
+        solve(bo)
+
+
+    def hint(self):
+        placeholder = copy.deepcopy(self.grid)
+        solved_board = solve(placeholder)
+        cntr = 0
+        print(cntr)
+        while cntr < 3:
+            print(cntr)
+            xidx = random.randint(0, 8)
+            yidx = random.randint(0, 8)
+            print([xidx, yidx])
+            if [xidx, yidx] not in self.locked_cells and [xidx, yidx] not in self.incorrect_cells:
+                self.grid[yidx][xidx] = solved_board[yidx][xidx]
+                cntr += 1
+        self.load()
+
+
+
 
     def draw_numbers(self, window):
         for yidx, row in enumerate(self.grid):
@@ -199,26 +221,44 @@ class App:
         return (self.mousepos[0] - grid_pos[0])//cell_size, (self.mousepos[1] - grid_pos[1])//cell_size
 
     def load_buttons(self):
-        self.playing_buttons.append(Button(20, 50, WIDTH//7, 40,
+        # Check
+        self.playing_buttons.append(Button(500, 50, WIDTH//7, 40,
                                            function=self.check_all_cells,
                                            color=(27, 142, 207), text='Check'))
-        self.playing_buttons.append(Button(140, 50, WIDTH // 7, 40,
-                                           function=self.get_puzzle,
-                                           color=(117, 172, 112), text='Submit', params=1))
-        self.playing_buttons.append(Button(WIDTH // 2 - (WIDTH//7) // 2, 50, WIDTH // 7, 40,
-                                           function=self.get_puzzle,
-                                           color=(255, 255, 0), text='Easy', params=75))
+        # Submit
         self.playing_buttons.append(Button(380, 50, WIDTH // 7, 40,
                                            function=self.get_puzzle,
-                                           color=(255, 128, 0), text='Medium', params=150))
-        self.playing_buttons.append(Button(500, 50, WIDTH // 7, 40,
+                                           color=(117, 172, 112), text='Submit', params=1))
+        # Beginner
+        self.playing_buttons.append(Button(20, 0, WIDTH // 7, 40,
                                            function=self.get_puzzle,
-                                           color=(255, 0, 0), text='Hard', params=225))
+                                           color=(15, 255, 51), text='Beginner', params=75))
+        # Easy
+        self.playing_buttons.append(Button(20, 50, WIDTH // 7, 40,
+                                           function=self.get_puzzle,
+                                           color=(255, 247, 15), text='Easy', params=150))
+        # Medium
         self.playing_buttons.append(Button(140, 0, WIDTH // 7, 40,
+                                           function=self.get_puzzle,
+                                           color=(255, 147, 15), text='Medium', params=225))
+        # Hard
+        self.playing_buttons.append(Button(140, 50, WIDTH // 7, 40,
+                                           function=self.get_puzzle,
+                                           color=(255, 0, 75), text='Hard', params=300))
+        # Very Hard
+        self.playing_buttons.append(Button(WIDTH // 2 - (WIDTH//7) // 2, 0, WIDTH // 7, 40,
+                                           function=self.get_puzzle,
+                                           color=(255, 0, 0), text='Very Hard', params=400))
+        # Load
+        self.playing_buttons.append(Button(380, 0, WIDTH // 7, 40,
                                            function=self.load,
                                            color=(153, 153, 255), text='Load'))
+        # Solve
         self.playing_buttons.append(Button(500, 0, WIDTH // 7, 40, function=self.solve_puzzle,
-                                           color=(6, 255, 22), text='Solve', params=self.grid))
+                                           color=(0, 255, 247), text='Solve', params=self.grid))
+        # Hint
+        self.playing_buttons.append(Button(WIDTH // 2 - (WIDTH//7) // 2, 50, WIDTH // 7, 40, function=self.hint,
+                                                   color=(195, 0, 255), text='Hint'))
         if len(self.incorrect_cells) == 0 and self.finished is True:
             self.playing_buttons.append(Button(200, 275, 200, 100, color=(3, 11, 252), highlightcolor=(3, 11, 252),
                                                text='Congratulations'))
@@ -261,8 +301,4 @@ class App:
         except:
             return False
 
-
 # TODO Add option to pencil in possible values
-# TODO Add hint button
-# TODO Add more difficulty levels
-
