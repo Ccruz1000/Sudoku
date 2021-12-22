@@ -88,7 +88,6 @@ class App:
         self.mousepos = pygame.mouse.get_pos()
         for button in self.playing_buttons:
             button.update(self.mousepos)
-
         if self.cell_changed:
             self.incorrect_cells = []
             if self.all_cells_done():
@@ -196,21 +195,21 @@ class App:
         solve(bo)
 
     def hint(self):
-        placeholder = copy.deepcopy(self.grid)
+        placeholder = copy.deepcopy(self.initial_board)
         solved_board = solve(placeholder)
         cntr = 0
+        iter = 0
+
         while cntr < 3:
             xidx = random.randint(0, 8)
             yidx = random.randint(0, 8)
             if [xidx, yidx] not in self.locked_cells and [xidx, yidx] not in self.incorrect_cells and self.grid[yidx][xidx] == 0:
-                try:
-                    self.grid[yidx][xidx] = solved_board[yidx][xidx]
-                    self.locked_cells.append((xidx, yidx))
-                    cntr += 1
-                except:
-                    print('Error ' + str(self.error_cntr) + ' Occured')
-                    self.error_cntr += 1
-                    break
+                self.grid[yidx][xidx] = solved_board[yidx][xidx]
+                self.locked_cells.append((xidx, yidx))
+                cntr += 1
+                iter += 1
+                if iter == 100:
+                    cntr = 3
 
     def reset_board(self):
         placeholder = copy.deepcopy(self.initial_board)
