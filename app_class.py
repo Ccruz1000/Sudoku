@@ -17,6 +17,7 @@ class App:
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         self.running = True
         self.grid = zero_board
+        self.error_cntr = 0
         self.selected = (0, 0)
         self.right_selected = None
         self.clicktype = None
@@ -80,11 +81,8 @@ class App:
                 if self.selected != None and self.selected not in self.locked_cells and self.clicktype == 3:
                     if self.is_int(event.unicode) and event.unicode not in self.pencil_list[self.selected[0]][self.selected[1]] and str(event.unicode) != '0':
                         self.pencil_list[self.selected[0]][self.selected[1]].append(str(event.unicode))
-                        print(self.pencil_list)
-                        print(self.selected)
                     elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
                         self.pencil_list[self.selected[0]][self.selected[1]] = self.pencil_list[self.selected[0]][self.selected[1]][:-1]
-                        print(self.pencil_list)
 
     def playing_update(self):
         self.mousepos = pygame.mouse.get_pos()
@@ -204,10 +202,15 @@ class App:
         while cntr < 3:
             xidx = random.randint(0, 8)
             yidx = random.randint(0, 8)
-            if [xidx, yidx] not in self.locked_cells and [xidx, yidx] not in self.incorrect_cells:
-                self.grid[yidx][xidx] = solved_board[yidx][xidx]
-                cntr += 1
-        self.load()
+            if [xidx, yidx] not in self.locked_cells and [xidx, yidx] not in self.incorrect_cells and self.grid[yidx][xidx] == 0:
+                try:
+                    self.grid[yidx][xidx] = solved_board[yidx][xidx]
+                    self.locked_cells.append((xidx, yidx))
+                    cntr += 1
+                except:
+                    print('Error ' + str(self.error_cntr) + ' Occured')
+                    self.error_cntr += 1
+                    break
 
     def reset_board(self):
         placeholder = copy.deepcopy(self.initial_board)
@@ -351,5 +354,3 @@ class App:
             return True
         except:
             return False
-
-# TODO Add reset button
