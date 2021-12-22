@@ -369,5 +369,5 @@ class App:
             print(self.finished)
             print(len(self.incorrect_cells))
 
-    # TODO ADD TIMER
+    # TODO MAKE TIMER STOP
     # TODO ADD HIGHSCORE
