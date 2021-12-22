@@ -21,7 +21,7 @@ class App:
         self.right_selected = None
         self.clicktype = None
         self.mousepos = None
-        self.pencil_list = [[[] for _ in range(9) ] for _ in range(9)]
+        self.pencil_list = [[[] for _ in range(9)] for _ in range(9)]
         #self.pencil_list = []
         self.state = "playing"
         self.finished = False
@@ -30,7 +30,7 @@ class App:
         self.locked_cells = []
         self.incorrect_cells = []
         self.font = pygame.font.SysFont("arial", int(cell_size//2))
-        self.pencil_font = pygame.font.SysFont("arial", int(cell_size)//5)
+        self.pencil_font = pygame.font.SysFont("arial", int(cell_size)//4)
         self.load()
 
     def run(self):
@@ -76,12 +76,12 @@ class App:
                         self.cell_changed = True
             if event.type == pygame.KEYDOWN:
                 if self.selected != None and self.selected not in self.locked_cells and self.clicktype == 3:
-                    if self.is_int(event.unicode) and event.unicode not in self.pencil_list and str(event.unicode) != '0':
+                    if self.is_int(event.unicode) and event.unicode not in self.pencil_list[self.selected[0]][self.selected[1]] and str(event.unicode) != '0':
                         self.pencil_list[self.selected[0]][self.selected[1]].append(str(event.unicode))
                         print(self.pencil_list)
                         print(self.selected)
                     elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
-                        self.pencil_list[self.selected[0]][self.selected[1]] = self.pencil_list[:-1]
+                        self.pencil_list[self.selected[0]][self.selected[1]] = self.pencil_list[self.selected[0]][self.selected[1]][:-1]
                         print(self.pencil_list)
 
     def playing_update(self):
@@ -216,9 +216,16 @@ class App:
         if selected is None:
             pass
         else:
-            pencil_list = " ".join(map(str, self.pencil_list[selected[0]][selected[1]]))
-            pos = [(selected[0] * cell_size) + grid_pos[0], (selected[1] * cell_size) + grid_pos[1]]
-            self.pencil_in(window, pencil_list, pos)
+            for yidx, row in enumerate(self.grid):
+                for xidx in range(len(row)):
+                    pencil_list =" ".join(map(str, self.pencil_list[xidx][yidx]))
+                    if len(pencil_list) < 12:
+                        pos = [(xidx * cell_size) + grid_pos[0], (yidx * cell_size) + grid_pos[1]]
+                        self.pencil_in(window, pencil_list, pos)
+                    else:
+                        self.pencil_list[selected[0]][selected[1]].pop(0)
+
+
 
     def draw_selection(self, window, pos):
         if self.clicktype == 1:
@@ -296,8 +303,8 @@ class App:
         font = self.font.render(text, False, BLACK)
         font_width = font.get_width()
         font_height = font.get_height()
-        pos[0] += (cell_size - font_width)//2 - 2
-        pos[1] += (cell_size - font_height)//2 + 2
+        pos[0] += (cell_size - font_width)//2
+        pos[1] += (cell_size - font_height)//2+3
         window.blit(font, pos)
 
     def pencil_in(self, window, text, pos):
@@ -321,6 +328,7 @@ class App:
 
     def load(self):
         self.playing_buttons = []
+        self.pencil_list = [[[] for _ in range(9)] for _ in range(9)]
         self.load_buttons()
         self.locked_cells = []
         self.finished = False
