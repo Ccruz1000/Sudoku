@@ -212,7 +212,7 @@ class App:
     def reset_board(self):
         placeholder = copy.deepcopy(self.initial_board)
         self.grid = placeholder
-        self.pencil_list = [[[] for _ in range(9)] for _ in range(9)]
+        self.load()
 
     def draw_numbers(self, window):
         for yidx, row in enumerate(self.grid):
