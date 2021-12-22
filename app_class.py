@@ -11,15 +11,18 @@ import copy
 # Init Board
 board = [[0 for x in range(9)] for x in range(9)]
 
-
 class App:
     def __init__(self):
         pygame.init()
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         self.running = True
         self.grid = board
-        self.selected = None
+        self.selected = (0, 0)
+        self.right_selected = None
+        self.clicktype = None
         self.mousepos = None
+        self.pencil_list = [[[] for _ in range(9) ] for _ in range(9)]
+        #self.pencil_list = []
         self.state = "playing"
         self.finished = False
         self.cell_changed = False
@@ -27,6 +30,7 @@ class App:
         self.locked_cells = []
         self.incorrect_cells = []
         self.font = pygame.font.SysFont("arial", int(cell_size//2))
+        self.pencil_font = pygame.font.SysFont("arial", int(cell_size)//5)
         self.load()
 
     def run(self):
@@ -44,9 +48,12 @@ class App:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            # User Clicks
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            LEFT = 1
+            RIGHT = 3
+            # User Left Clicks
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == LEFT:
                 selected = self.mouse_on_grid()
+                self.clicktype = LEFT
                 if selected:
                     self.selected = selected
                 else:
@@ -54,12 +61,28 @@ class App:
                     for button in self.playing_buttons:
                         if button.highlighted:
                             button.click()
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == RIGHT:
+                selected = self.mouse_on_grid()
+                self.clicktype = RIGHT
+                if selected:
+                    self.selected = selected
+                else:
+                    self.selected = None
             # User types a key
             if event.type == pygame.KEYDOWN:
-                if self.selected != None and self.selected not in self.locked_cells:
+                if self.selected != None and self.selected not in self.locked_cells and self.clicktype == 1:
                     if self.is_int(event.unicode):
                         self.grid[self.selected[1]][self.selected[0]] = int(event.unicode)
                         self.cell_changed = True
+            if event.type == pygame.KEYDOWN:
+                if self.selected != None and self.selected not in self.locked_cells and self.clicktype == 3:
+                    if self.is_int(event.unicode) and event.unicode not in self.pencil_list and str(event.unicode) != '0':
+                        self.pencil_list[self.selected[0]][self.selected[1]].append(str(event.unicode))
+                        print(self.pencil_list)
+                        print(self.selected)
+                    elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
+                        self.pencil_list[self.selected[0]][self.selected[1]] = self.pencil_list[:-1]
+                        print(self.pencil_list)
 
     def playing_update(self):
         self.mousepos = pygame.mouse.get_pos()
@@ -84,6 +107,7 @@ class App:
         self.shade_locked_cells(self.window, self.locked_cells)
         self.shade_incorrect_cells(self.window, self.incorrect_cells)
         self.draw_numbers(self.window)
+        self.draw_pencil(self.window, self.selected)
         self.drawgrid(self.window)
         for button in self.playing_buttons:
             button.draw(self.window)
@@ -188,9 +212,21 @@ class App:
                     pos = [(xidx * cell_size) + grid_pos[0], (yidx * cell_size) + grid_pos[1]]
                     self.text_to_screen(window, str(num), pos)
 
+    def draw_pencil(self, window, selected):
+        if selected is None:
+            pass
+        else:
+            pencil_list = " ".join(map(str, self.pencil_list[selected[0]][selected[1]]))
+            pos = [(selected[0] * cell_size) + grid_pos[0], (selected[1] * cell_size) + grid_pos[1]]
+            self.pencil_in(window, pencil_list, pos)
+
     def draw_selection(self, window, pos):
-        pygame.draw.rect(window, LIGHTBLUE, ((pos[0]*cell_size)+grid_pos[0], (pos[1]*cell_size)+grid_pos[1],
-                                             cell_size, cell_size))
+        if self.clicktype == 1:
+            pygame.draw.rect(window, LIGHTBLUE, ((pos[0]*cell_size)+grid_pos[0], (pos[1]*cell_size)+grid_pos[1],
+                                                cell_size, cell_size))
+        elif self.clicktype == 3:
+            pygame.draw.rect(window, LIGHTRED, ((pos[0] * cell_size) + grid_pos[0], (pos[1] * cell_size) + grid_pos[1],
+                                                cell_size, cell_size))
 
     def drawgrid(self, window):
         pygame.draw.rect(window, BLACK, (grid_pos[0], grid_pos[1], WIDTH-(2 * out_buff), HEIGHT-(2 * out_buff)), 2)
@@ -218,10 +254,10 @@ class App:
         self.playing_buttons.append(Button(500, 50, WIDTH//7, 40,
                                            function=self.check_all_cells,
                                            color=(27, 142, 207), text='Check'))
-        # Submit
-        self.playing_buttons.append(Button(380, 50, WIDTH // 7, 40,
+        # Clear
+        self.playing_buttons.append(Button(380, 0, WIDTH // 7, 40,
                                            function=self.get_puzzle,
-                                           color=(117, 172, 112), text='Submit', params=1))
+                                           color=(117, 172, 112), text='Clear', params=1))
         # Beginner
         self.playing_buttons.append(Button(20, 0, WIDTH // 7, 40,
                                            function=self.get_puzzle,
@@ -243,7 +279,7 @@ class App:
                                            function=self.get_puzzle,
                                            color=(255, 0, 0), text='Very Hard', params=400))
         # Load
-        self.playing_buttons.append(Button(380, 0, WIDTH // 7, 40,
+        self.playing_buttons.append(Button(380, 50, WIDTH // 7, 40,
                                            function=self.load,
                                            color=(153, 153, 255), text='Load'))
         # Solve
@@ -260,9 +296,18 @@ class App:
         font = self.font.render(text, False, BLACK)
         font_width = font.get_width()
         font_height = font.get_height()
-        pos[0] += (cell_size - font_width)//2
-        pos[1] += (cell_size - font_height)//2
+        pos[0] += (cell_size - font_width)//2 - 2
+        pos[1] += (cell_size - font_height)//2 + 2
         window.blit(font, pos)
+
+    def pencil_in(self, window, text, pos):
+        font = self.pencil_font.render(text, False, PENCILCOLOR)
+        font_width = font.get_width()//4
+        font_height = font.get_height()//4
+        pos[0] += (cell_size - font_width)//2 - 16
+        pos[1] += (cell_size - font_height)//2 - 20
+        window.blit(font, pos)
+
 
     def shade_locked_cells(self, window, locked):
         for cell in locked:
