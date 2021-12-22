@@ -17,14 +17,13 @@ class App:
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         self.running = True
         self.grid = zero_board
-        self.error_cntr = 0
         self.selected = (0, 0)
         self.right_selected = None
         self.clicktype = None
         self.mousepos = None
         self.initial_board = zero_board
+        self.difficulty = None
         self.pencil_list = [[[] for _ in range(9)] for _ in range(9)]
-        #self.pencil_list = []
         self.state = "playing"
         self.finished = False
         self.cell_changed = False
@@ -33,6 +32,8 @@ class App:
         self.incorrect_cells = []
         self.font = pygame.font.SysFont("arial", int(cell_size//2))
         self.pencil_font = pygame.font.SysFont("arial", int(cell_size)//4)
+        self.total_time = None
+        self.start_time = pygame.time.get_ticks()
         self.reset_board()
         self.load()
 
@@ -106,6 +107,7 @@ class App:
         self.shade_locked_cells(self.window, self.locked_cells)
         self.shade_incorrect_cells(self.window, self.incorrect_cells)
         self.draw_numbers(self.window)
+        self.timer(self.window)
         self.draw_pencil(self.window, self.selected)
         self.drawgrid(self.window)
         for button in self.playing_buttons:
@@ -179,10 +181,11 @@ class App:
 # Helper Functions
 
     def get_puzzle(self, difficulty):
-        if difficulty == 1:
+        self.difficulty = difficulty
+        if self.difficulty == 1:
             board = [[0 for x in range(9)] for x in range(9)]
         else:
-            board = np.array(list(str(generators.random_sudoku(avg_rank=difficulty))))
+            board = np.array(list(str(generators.random_sudoku(avg_rank=self.difficulty))))
             board = board.astype(int)
             board = board.reshape((9, 9))
             board = board.tolist()
@@ -350,3 +353,21 @@ class App:
             return True
         except:
             return False
+
+    def timer(self, window):
+        if not self.finished:
+            start_time = self.start_time
+            self.total_time = pygame.time.get_ticks() - start_time
+            # Convert time to minutes and seconds
+            counting_minutes = int(self.total_time / 60000)
+            counting_seconds = int((self.total_time % 60000) / 1000)
+            counting_millisecond = int(self.total_time % 1000)
+            counting_string = str(counting_minutes).zfill(2) + ":" + str(counting_seconds).zfill(2) + ":" + str(counting_millisecond).zfill(3)
+            counting_text = self.font.render(counting_string, False, BLACK)
+            counting_rect = pygame.draw.rect(window, WHITE, (250, 550, 150, 50), 2)
+            window.blit(counting_text, counting_rect)
+            print(self.finished)
+            print(len(self.incorrect_cells))
+
+    # TODO ADD TIMER
+    # TODO ADD HIGHSCORE
