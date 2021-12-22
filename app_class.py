@@ -9,18 +9,19 @@ import random
 import copy
 
 # Init Board
-board = [[0 for x in range(9)] for x in range(9)]
+zero_board = [[0 for x in range(9)] for x in range(9)]
 
 class App:
     def __init__(self):
         pygame.init()
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         self.running = True
-        self.grid = board
+        self.grid = zero_board
         self.selected = (0, 0)
         self.right_selected = None
         self.clicktype = None
         self.mousepos = None
+        self.initial_board = zero_board
         self.pencil_list = [[[] for _ in range(9)] for _ in range(9)]
         #self.pencil_list = []
         self.state = "playing"
@@ -31,6 +32,7 @@ class App:
         self.incorrect_cells = []
         self.font = pygame.font.SysFont("arial", int(cell_size//2))
         self.pencil_font = pygame.font.SysFont("arial", int(cell_size)//4)
+        self.reset_board()
         self.load()
 
     def run(self):
@@ -188,6 +190,8 @@ class App:
             board = board.reshape((9, 9))
             board = board.tolist()
         self.grid = board
+        self.initial_board = board
+        self.reset_board()
         self.load()
 
     def solve_puzzle(self, bo):
@@ -204,6 +208,10 @@ class App:
                 self.grid[yidx][xidx] = solved_board[yidx][xidx]
                 cntr += 1
         self.load()
+
+    def reset_board(self):
+        placeholder = copy.deepcopy(self.initial_board)
+        self.grid = placeholder
 
     def draw_numbers(self, window):
         for yidx, row in enumerate(self.grid):
@@ -224,8 +232,6 @@ class App:
                         self.pencil_in(window, pencil_list, pos)
                     else:
                         self.pencil_list[selected[0]][selected[1]].pop(0)
-
-
 
     def draw_selection(self, window, pos):
         if self.clicktype == 1:
@@ -280,11 +286,11 @@ class App:
         # Hard
         self.playing_buttons.append(Button(140, 50, WIDTH // 7, 40,
                                            function=self.get_puzzle,
-                                           color=(255, 0, 75), text='Hard', params=300))
-        # Very Hard
+                                           color=(255, 0, 0), text='Hard', params=300))
+        # Reset
         self.playing_buttons.append(Button(WIDTH // 2 - (WIDTH//7) // 2, 0, WIDTH // 7, 40,
-                                           function=self.get_puzzle,
-                                           color=(255, 0, 0), text='Very Hard', params=400))
+                                           function=self.reset_board,
+                                           color=(255, 0, 210), text='Reset'))
         # Load
         self.playing_buttons.append(Button(380, 50, WIDTH // 7, 40,
                                            function=self.load,
@@ -314,7 +320,6 @@ class App:
         pos[0] += (cell_size - font_width)//2 - 16
         pos[1] += (cell_size - font_height)//2 - 20
         window.blit(font, pos)
-
 
     def shade_locked_cells(self, window, locked):
         for cell in locked:
@@ -346,4 +351,4 @@ class App:
         except:
             return False
 
-# TODO Add option to pencil in possible values
+# TODO Add reset button
