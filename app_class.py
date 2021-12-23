@@ -85,6 +85,7 @@ class App:
                     elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
                         self.pencil_list[self.selected[0]][self.selected[1]] = self.pencil_list[self.selected[0]][self.selected[1]][:-1]
 
+
     def playing_update(self):
         self.mousepos = pygame.mouse.get_pos()
         for button in self.playing_buttons:
@@ -96,6 +97,7 @@ class App:
                 self.check_all_cells()
                 if len(self.incorrect_cells) == 0:
                     self.finished = True
+                    self.timer(self.window)
                     button.draw(self.window)
                     self.playing_draw()
                     self.load()
@@ -190,6 +192,10 @@ class App:
             board = board.reshape((9, 9))
             board = board.tolist()
         self.grid = board
+        self.start_time = pygame.time.get_ticks()
+        self.total_time = pygame.time.get_ticks() - self.start_time
+        print(self.total_time)
+        print(self.start_time)
         self.initial_board = board
         self.reset_board()
         self.load()
@@ -361,13 +367,10 @@ class App:
             # Convert time to minutes and seconds
             counting_minutes = int(self.total_time / 60000)
             counting_seconds = int((self.total_time % 60000) / 1000)
-            counting_millisecond = int(self.total_time % 1000)
-            counting_string = str(counting_minutes).zfill(2) + ":" + str(counting_seconds).zfill(2) + ":" + str(counting_millisecond).zfill(3)
+            counting_string = str(counting_minutes).zfill(2) + ":" + str(counting_seconds).zfill(2)
             counting_text = self.font.render(counting_string, False, BLACK)
-            counting_rect = pygame.draw.rect(window, WHITE, (250, 550, 150, 50), 2)
+            counting_rect = pygame.draw.rect(window, WHITE, (275, 550, 150, 50), 2)
             window.blit(counting_text, counting_rect)
-            print(self.finished)
-            print(len(self.incorrect_cells))
 
-    # TODO MAKE TIMER STOP
+    # TODO MAKE TIMER STOP AFTER WON
     # TODO ADD HIGHSCORE
