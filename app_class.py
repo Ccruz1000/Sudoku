@@ -34,6 +34,7 @@ class App:
         self.pencil_font = pygame.font.SysFont("arial", int(cell_size)//4)
         self.total_time = None
         self.start_time = pygame.time.get_ticks()
+        self.win = False
         self.reset_board()
         self.load()
 
@@ -97,10 +98,10 @@ class App:
                 self.check_all_cells()
                 if len(self.incorrect_cells) == 0:
                     self.finished = True
-                    self.timer(self.window)
                     button.draw(self.window)
                     self.playing_draw()
                     self.load()
+
 
     def playing_draw(self):
         self.window.fill(WHITE)
@@ -194,8 +195,6 @@ class App:
         self.grid = board
         self.start_time = pygame.time.get_ticks()
         self.total_time = pygame.time.get_ticks() - self.start_time
-        print(self.total_time)
-        print(self.start_time)
         self.initial_board = board
         self.reset_board()
         self.load()
